@@ -1,7 +1,6 @@
-
-
-const TextHighlightRules = window.ace.acequire('ace/mode/text_highlight_rules').TextHighlightRules;
-
+import ace from 'brace';
+const { TextHighlightRules } = ace.acequire('ace/mode/text_highlight_rules');
+const { TextMode } = ace.acequire('ace/mode/text');
 
 export class CustomSqlHighlightRules extends TextHighlightRules {
   constructor() {
@@ -76,7 +75,6 @@ export class CustomSqlHighlightRules extends TextHighlightRules {
   }
 }
 
-const TextMode = window.ace.acequire('ace/mode/text').Mode;
 
 export default class CustomSqlMode extends TextMode {
   constructor() {

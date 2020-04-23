@@ -7,6 +7,8 @@ const basePath = chrome.getBasePath();
 const apiPath = `${basePath}${API_ROUTE_SQL}`;
 
 
-export function submitRequest(sqlQuery) {
-  return fetch.post(`${apiPath}`, { ...sqlQuery }).then(results => {return results.data});
+export function submitRequest(sqlQuery: any) {
+  return fetch.post(`${apiPath}`, {...sqlQuery}).then(results => {
+    return results.data
+  });
 }

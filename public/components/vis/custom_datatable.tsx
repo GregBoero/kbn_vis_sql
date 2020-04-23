@@ -1,25 +1,39 @@
-import {Component} from 'react';
-import {
-  EuiInMemoryTable,
-  EuiButton, EuiFlexGroup, EuiFlexItem
-} from '@elastic/eui';
-import React from 'react';
-import PropTypes from 'prop-types';
-import {each, isObject, toArray} from 'lodash'
+import {PureComponent} from 'react';
+import {each, isObject, toArray} from 'lodash';
+// @ts-ignore
 import {saveAs} from '@elastic/filesaver'
-import moment from 'moment/moment'
+import moment = require('moment');
+import { EuiInMemoryTable } from '@elastic/eui';
+import React from 'react';
+import { EuiFlexGroup } from '@elastic/eui';
+import { EuiFlexItem } from '@elastic/eui';
+import { EuiButton } from '@elastic/eui';
 
-export class CustomDatatable extends Component {
+interface CustomDatatableProps {
+  datasource: any,
+  getNextPage: () => Promise<any>,
+}
 
-  constructor(props, context) {
+interface CustomDatatableState {
+  columns: Array<any>;
+  items: Array<any>;
+  csv: { filename: string, separator: string, quoteValues: boolean };
+  cursor: any;
+  isLoading: boolean;
+}
+
+export class CustomDatatable extends PureComponent<CustomDatatableProps, CustomDatatableState> {
+  state: CustomDatatableState = {
+    columns: [],
+    items: [],
+    csv: {filename: '', separator: ',', quoteValues: true},
+    cursor: {},
+    isLoading: true,
+  };
+
+
+  constructor(props: CustomDatatableProps, context: any) {
     super(props, context);
-    this.state = {
-      columns: [],
-      items: [],
-      csv: {filename: '', separator: ',', quoteValues: true},
-      cursor: {},
-      isLoading: true,
-    };
     this._datasourceToStateModel();
   }
 
@@ -33,7 +47,7 @@ export class CustomDatatable extends Component {
   }
 
   _afterPageUpdate() {
-    const datatable = this.props.datatable;
+    const datatable = this.props.datasource;
     const columns = each(datatable.columns, (column) => column.sortable = true);
     const items = datatable.rows;
     const filename = moment().toISOString() + datatable.exportName + '.csv';
@@ -47,12 +61,12 @@ export class CustomDatatable extends Component {
     }));
   }
 
-  _toCsv() {
+  _toCsv(): any {
     const nonAlphaNumRE = /[^a-zA-Z0-9]/;
     const allDoubleQuoteRE = /"/g;
     const quoteValues = this.state.csv.quoteValues;
 
-    const escape = (val) => {
+    const escape = (val: any) => {
       if (quoteValues && nonAlphaNumRE.test(val)) {
         val = '"' + val.replace(allDoubleQuoteRE, '""') + '"';
       }
@@ -126,10 +140,5 @@ export class CustomDatatable extends Component {
       />
     );
   }
+
 }
-
-CustomDatatable.propTypes = {
-  datasource: PropTypes.object.isRequired,
-  getNextPage: PropTypes.func.isRequired,
-};
-

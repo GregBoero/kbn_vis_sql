@@ -1,30 +1,30 @@
-import React, {Component} from 'react';
+import React, {ChangeEvent, Component} from 'react';
 import _ from 'lodash';
-import PropTypes from 'prop-types';
-import {
-  EuiFormRow,
-  EuiSelect,
-  EuiSpacer,
-  EuiForm,
-  EuiSwitch,
-} from '@elastic/eui';
+import {EuiForm, EuiFormRow, EuiSelect, EuiSpacer, EuiSwitch, EuiSwitchEvent,} from '@elastic/eui';
+import {QueryVisParams} from '../query/query_controls_tab';
+import {VisOptionsProps} from "ui/vis/editors/default";
 
-export class QueryVisOptionTab extends Component {
+type QueryVisOptionTabProps =
+  Pick<VisOptionsProps<QueryVisParams>, 'vis' | 'stateParams' | 'setValue'> & {
+  stateParams: any;
+}
+
+export class QueryVisOptionTab extends Component<QueryVisOptionTabProps, QueryVisParams> {
   options = [{value: 'datatable', text: 'DataTables'}, {value: 'metric', text: 'Metric'}];
 
-  constructor(props, context) {
+  constructor(props: QueryVisOptionTabProps, context: any) {
     super(props, context);
   }
 
-  setVisParam(paramName, paramValue) {
+  setVisParam<T extends keyof QueryVisParams>(paramName: T, paramValue: QueryVisParams[T]) {
     this.props.setValue(paramName, paramValue);
-  };
+  }
 
-  handleVisTypeChange = (evt) => {
+  handleVisTypeChange = (evt: ChangeEvent<HTMLSelectElement>) => {
     this.setVisParam('visType', _.trim(evt.target.value));
   };
 
-  handleUseTimeFilterChange = (evt) => {
+  handleUseTimeFilterChange = (evt: EuiSwitchEvent) => {
     this.setVisParam('useTimeFilter', evt.target.checked);
   };
 
@@ -61,6 +61,3 @@ export class QueryVisOptionTab extends Component {
   }
 }
 
-QueryVisOptionTab.propTypes = {
-  stateParams: PropTypes.object.isRequired,
-};

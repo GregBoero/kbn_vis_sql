@@ -1,28 +1,41 @@
-import React, {Component} from 'react';
+import React, {PureComponent} from 'react';
+import {InjectedIntlProps} from 'react-intl';
+
 import _ from 'lodash';
-import PropTypes from 'prop-types';
-import {
-  EuiFormRow,
-  EuiCodeEditor,
-} from '@elastic/eui';
+// @ts-ignore
+import {EuiCodeEditor, EuiFormRow,} from '@elastic/eui';
+
 import CustomSqlMode from './ace_sql_rule/custom_sql_highlight_rules'
+import {VisOptionsProps} from "ui/vis/editors/default";
 
-export class QueryControlsTab extends Component {
-  aceEditor;
-  usingTimeFilter;
-  helpText;
+export type QueryVisParams = {
+  query: string;
+  visType: string,
+  useTimeFilter: boolean,
+  isLoading: boolean,
+  exportName: string,
+}
+
+export type QueryControlsTabProps = InjectedIntlProps &
+  Pick<VisOptionsProps<QueryVisParams>, 'vis' | 'stateParams' | 'setValue'> & {
+  stateParams: any,
+}
 
 
-  constructor(props, context) {
+export class QueryControlsTab extends PureComponent<QueryControlsTabProps> {
+  aceEditor: any;
+  helpText: string = '';
+
+
+  constructor(props: QueryControlsTabProps, context: any) {
     super(props, context);
-    this.usingTimeFilter = props.stateParams.useTimeFilter;
   }
 
-  setVisParam(paramName, paramValue) {
+  setVisParam<T extends keyof QueryVisParams>(paramName: T, paramValue: QueryVisParams[T]) {
     this.props.setValue(paramName, paramValue);
-  };
+  }
 
-  aceLoaded = (editor) => {
+  aceLoaded = (editor: any) => {
     const session = editor.getSession();
     session.setTabSize(2);
     session.setUseSoftTabs(true);
@@ -30,14 +43,14 @@ export class QueryControlsTab extends Component {
     this.aceEditor = editor;
   };
 
-  handleQueryChange = (queryString) => {
+  handleQueryChange = (queryString: string) => {
     this.setVisParam('query', queryString);
   };
 
 
-  shouldComponentUpdate(nextProps, nextState, nextContext) {
+  shouldComponentUpdate(nextProps: QueryControlsTabProps, nextState: any) {
     //TODO refactor the function to be more clear
-    if (this.usingTimeFilter !== nextProps.stateParams.useTimeFilter) {
+    if (this.props.stateParams.usingTimeFilter !== nextProps.stateParams.useTimeFilter) {
       let query = nextProps.stateParams.query.toLowerCase();
       const dateTimeExpression = '\"@timestamp\" between [from] and [to] ';
       if (nextProps.stateParams.useTimeFilter) {
@@ -60,13 +73,13 @@ export class QueryControlsTab extends Component {
         this.helpText = '';
       }
       nextProps.stateParams.query = query;
-      this.usingTimeFilter = nextProps.stateParams.useTimeFilter;
       return true;
     }
 
     if (this.props !== nextProps) {
       return true;
     }
+    return false;
 
   }
 
@@ -98,10 +111,6 @@ export class QueryControlsTab extends Component {
 
     );
   }
-
-
 }
 
-QueryControlsTab.propTypes = {
-  stateParams: PropTypes.object.isRequired,
-};
+

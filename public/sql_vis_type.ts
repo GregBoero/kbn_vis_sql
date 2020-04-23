@@ -1,21 +1,18 @@
-import {visFactory} from 'ui/vis/vis_factory';
+import {SqlVisDependencies} from "./plugin";
+import {defaultFeedbackMessage, Status} from '../../../src/legacy/core_plugins/visualizations/public/index';
 import chrome from 'ui/chrome';
-import {defaultFeedbackMessage} from 'ui/vis/default_feedback_message';
-import {Status} from 'ui/vis/update_status';
+import {SqlRequestHandlerProvider} from "./sql_request_handler_provider";
+import {QueryControlsTab} from "./components/editor/query/query_controls_tab";
+import {QueryVisOptionTab} from "./components/editor/option/query_vis_option_tab";
+import {createSqlVisController} from "./vis_controller";
 
-import {VisController} from './vis_controller';
-import {QueryControlsTab} from './components/editor/query/query_controls_tab';
-import {QueryVisOptionTab} from './components/editor/option/query_vis_option_tab';
-import {SqlRequestHandlerProvider} from './sql_request_handler_provider';
+export function createSqlVisTypeDefinition(deps: SqlVisDependencies) {
+  const SqlVisController = createSqlVisController(deps);
 
-import { setup as visualisation } from '../../../src/legacy/core_plugins/visualizations/public/np_ready/public/legacy';
-
-visualisation.types.registerVisualization(() => {
   const config = chrome.getUiSettingsClient();
   const visRequestHandler = SqlRequestHandlerProvider(config).handler;
 
-  // return the visType object, which kibana will use to display and configure new Vis object of this type.
-  return visFactory.createBaseVisualization({
+  return {
     name: 'kbn_vis_sql',
     title: 'Sql query Visualisation',
     icon: 'visTimelion',
@@ -35,7 +32,7 @@ visualisation.types.registerVisualization(() => {
       // Check if the UI state of the visualization has been changed
       Status.UI_STATE],
     feedbackMessage: defaultFeedbackMessage,
-    visualization: VisController,
+    visualization: SqlVisController,
     visConfig: {
       defaults: {
         query: '',
@@ -67,6 +64,5 @@ visualisation.types.registerVisualization(() => {
     },
     requestHandler: visRequestHandler,
     responseHandler: 'none',
-  });
-});
-
+  };
+}

@@ -1,17 +1,14 @@
 import _ from 'lodash';
 import moment from 'moment/moment';
 import {submitRequest} from './service/sql_api_service'
+// @ts-ignore
 import {notify} from '../../../x-pack/legacy/plugins/canvas/public/lib/notify'
+// @ts-ignore
+import {TimeCache} from "../../../src/legacy/core_plugins/vis_type_vega/public/data_model/time_cache";
 
 export class SqlParser {
 
-
-  constructor(query, useTimeFilter, visType, filters, timeCache) {
-    this.query = query;
-    this.useTimeFilter = useTimeFilter;
-    this.timeCache = timeCache;
-    this.filters = filters;
-    this.visType = visType;
+  constructor(public query: string, public useTimeFilter: boolean, public visType: string, public filters: any, public timeCache: TimeCache) {
   }
 
   async parseAsync() {
@@ -43,7 +40,7 @@ export class SqlParser {
     }
   }
 
-  async _parseTimeFilter(parsedQuery) {
+  async _parseTimeFilter(parsedQuery: string) {
     if (this.useTimeFilter) {
       // get the time object from the time cache {min,max}
       const bound = this.timeCache.getTimeBounds();

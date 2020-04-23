@@ -1,15 +1,16 @@
-import {buildEsQuery, getEsQueryConfig} from '@kbn/es-query';
 import {timefilter} from 'ui/timefilter';
 import {SqlParser} from './sql_parser';
+// @ts-ignore
 import {TimeCache} from "../../../src/legacy/core_plugins/vis_type_vega/public/data_model/time_cache";
+import {buildEsQuery, getEsQueryConfig} from 'src/plugins/data/common/es_query/es_query';
 
 
-export function SqlRequestHandlerProvider(config) {
+export function SqlRequestHandlerProvider(config: any) {
   const timeCache = new TimeCache(timefilter, 3 * 1000);
 
   return {
     name: 'sql',
-    handler({timeRange, filters, query, visParams}) {
+    handler({timeRange, filters, query, visParams}: any) {
       visParams.isLoading = true;
       timeCache.setTimeRange(timeRange);
       const esQueryConfigs = getEsQueryConfig(config);
