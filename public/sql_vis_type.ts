@@ -1,16 +1,13 @@
 import {SqlVisDependencies} from "./plugin";
 import {defaultFeedbackMessage, Status} from '../../../src/legacy/core_plugins/visualizations/public/index';
-import chrome from 'ui/chrome';
 import {SqlRequestHandlerProvider} from "./sql_request_handler_provider";
 import {QueryControlsTab} from "./components/editor/query/query_controls_tab";
 import {QueryVisOptionTab} from "./components/editor/option/query_vis_option_tab";
-import {createSqlVisController} from "./vis_controller";
+import {SqlVisController} from "./vis_controller";
 
 export function createSqlVisTypeDefinition(deps: SqlVisDependencies) {
-  const SqlVisController = createSqlVisController(deps);
 
-  const config = chrome.getUiSettingsClient();
-  const visRequestHandler = SqlRequestHandlerProvider(config).handler;
+  const visRequestHandler = SqlRequestHandlerProvider(deps);
 
   return {
     name: 'kbn_vis_sql',

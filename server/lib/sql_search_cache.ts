@@ -6,7 +6,7 @@ import {sanitizeName} from '../../../../x-pack/legacy/plugins/canvas/server/lib/
 import {normalizeType} from '../../../../x-pack/legacy/plugins/canvas/server/lib/normalize_type';
 import {Legacy} from "kibana";
 import {CallClusterWithRequest} from "../../../../src/legacy/core_plugins/elasticsearch";
-import Request = Legacy.Request;
+
 
 export class SqlSearchCache {
   private _cache: LruCache<string, any>;
@@ -22,7 +22,7 @@ export class SqlSearchCache {
    * with the new ones already in cache
    * @param {object} request the request
    */
-  search = (request: Request) => {
+  search = (request: Legacy.Request) => {
     //TODO fix ts-ignore with a real object
     const payload = request.payload;
     // @ts-ignore

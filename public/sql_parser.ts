@@ -1,17 +1,23 @@
 import _ from 'lodash';
-import moment from 'moment/moment';
 import {submitRequest} from './service/sql_api_service'
 // @ts-ignore
 import {notify} from '../../../x-pack/legacy/plugins/canvas/public/lib/notify'
 // @ts-ignore
 import {TimeCache} from "../../../src/legacy/core_plugins/vis_type_vega/public/data_model/time_cache";
+import {DslQuery} from 'src/plugins/data/common/es_query/kuery';
+import {esFilters} from 'src/plugins/data/public';
+import moment from 'moment';
+
+
+export type FilterDslType = { bool: { must: DslQuery[]; filter: esFilters.Filter[]; should: never[]; must_not: esFilters.Filter[]; }; }
 
 export class SqlParser {
 
-  constructor(public query: string, public useTimeFilter: boolean, public visType: string, public filters: any, public timeCache: TimeCache) {
+  constructor(public query: string, public useTimeFilter: boolean, public visType: string, public filters: FilterDslType, public timeCache: TimeCache) {
+
   }
 
-  async parseAsync() {
+  async parseAsync(): Promise<any> {
     if (this.query && this.query.length > 0) {
       let parsedQuery = _.clone(this.query);
       parsedQuery = await this._parseTimeFilter(parsedQuery);
@@ -40,7 +46,7 @@ export class SqlParser {
     }
   }
 
-  async _parseTimeFilter(parsedQuery: string) {
+  _parseTimeFilter(parsedQuery: string): string {
     if (this.useTimeFilter) {
       // get the time object from the time cache {min,max}
       const bound = this.timeCache.getTimeBounds();

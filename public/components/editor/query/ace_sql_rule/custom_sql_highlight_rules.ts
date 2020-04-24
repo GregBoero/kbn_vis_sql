@@ -1,84 +1,52 @@
 import ace from 'brace';
-const { TextHighlightRules } = ace.acequire('ace/mode/text_highlight_rules');
-const { TextMode } = ace.acequire('ace/mode/text');
+import {ElasticsearchSqlHighlightRules} from "../../../../../../../src/legacy/core_plugins/console/public/np_ready/application/models/legacy_core_editor/mode/elasticsearch_sql_highlight_rules";
 
-export class CustomSqlHighlightRules extends TextHighlightRules {
-  constructor() {
-    super();
+// const oop = ace.acequire('ace/lib/oop');
+const TextMode = ace.acequire('ace/mode/text').Mode;
 
 
-    const keywords = (
-      "select|insert|update|delete|from|where|and|or|group|by|order|limit|offset|having|as|case|" +
-      "when|then|else|end|type|left|right|join|on|outer|desc|asc|union|create|table|primary|key|if|" +
-      "foreign|not|references|default|null|inner|cross|natural|database|drop|grant|between"
-    );
-
-    const builtinConstants = (
-      "true|false"
-    );
-
-    const builtinFunctions = (
-      "avg|count|first|last|max|min|sum|ucase|lcase|mid|len|round|rank|now|format|" +
-      "coalesce|ifnull|isnull|nvl"
-    );
-
-    const dataTypes = (
-      "int|numeric|decimal|date|varchar|char|bigint|float|double|bit|binary|text|set|timestamp|" +
-      "money|real|number|integer"
-    );
-
-    const keywordMapper = this.createKeywordMapper({
-      "support.function": builtinFunctions,
-      "keyword": keywords,
-      "constant.language": builtinConstants,
-      "storage.type": dataTypes
-    }, "identifier", true);
-
-    this.$rules = {
-      "start": [{
-        token: "comment",
-        regex: "--.*$"
-      }, {
-        token: "comment",
-        start: "/\\*",
-        end: "\\*/"
-      }, {
-        token: "string",           // " string
-        regex: '".*?"'
-      }, {
-        token: "string",           // ' string
-        regex: "'.*?'"
-      }, {
-        token: "string",           // ` string (apache drill)
-        regex: "`.*?`"
-      }, {
-        token: "constant.numeric", // float
-        regex: "[+-]?\\d+(?:(?:\\.\\d*)?(?:[eE][+-]?\\d+)?)?\\b"
-      }, {
-        token: keywordMapper,
-        regex: "[a-zA-Z_$][a-zA-Z0-9_$]*\\b"
-      }, {
-        token: "keyword.operator",
-        regex: "\\+|\\-|\\/|\\/\\/|%|<@>|@>|<@|&|\\^|~|<|>|<=|=>|==|!=|<>|="
-      }, {
-        token: "paren.lparen",
-        regex: "[\\(]"
-      }, {
-        token: "paren.rparen",
-        regex: "[\\)]"
-      }, {
-        token: "text",
-        regex: "\\s+"
-      }]
-    };
-    this.normalizeRules();
-  }
+export class CustomSqlMode extends TextMode {
+  HighlightRules = ElasticsearchSqlHighlightRules;
 }
 
+// export function CustomSqlMode(this: any) {
+//   // @ts-ignore
+//   this.$tokenizer = new AceTokenizer(new ElasticsearchSqlHighlightRules().getRules());
+//   // this.$outdent = new MatchingBraceOutdent();
+//   this.$behaviour = new CstyleBehaviour();
+//   // this.foldingRules = new CStyleFoldMode();
+// }
+// oop.inherits(CustomSqlMode, TextMode);
+//
+// (function (this: any) {
+//   this.HighlightRules = ElasticsearchSqlHighlightRules;
+//
+//   this.getNextLineIndent = function (state:any, line:any, tab:any) {
+//     let indent = this.$getIndent(line);
+//     const match = line.match(/^.*[\{\[]\s*$/);
+//     if (match) {
+//       indent += tab;
+//     }
+//
+//     return indent;
+//   };
+//
+//   this.checkOutdent = function (state:any, line:any, input:any) {
+//     return this.$outdent.checkOutdent(line, input);
+//   };
+//
+//   this.autoOutdent = function (state:any, doc:any, row:any) {
+//     this.$outdent.autoOutdent(doc, row);
+//   };
+//
+// }.call(CustomSqlMode.prototype));
 
-export default class CustomSqlMode extends TextMode {
-  constructor() {
-    super();
-    this.HighlightRules = CustomSqlHighlightRules;
-  }
-}
+
+
+
+
+
+
+
+
+

@@ -1,9 +1,9 @@
-import {PureComponent} from 'react';
-import {each, isObject, toArray} from 'lodash';
+import {Component} from 'react';
 // @ts-ignore
 import {saveAs} from '@elastic/filesaver'
-import moment = require('moment');
 import { EuiInMemoryTable } from '@elastic/eui';
+import moment from 'moment';
+import _ from 'lodash';
 import React from 'react';
 import { EuiFlexGroup } from '@elastic/eui';
 import { EuiFlexItem } from '@elastic/eui';
@@ -11,7 +11,7 @@ import { EuiButton } from '@elastic/eui';
 
 interface CustomDatatableProps {
   datasource: any,
-  getNextPage: () => Promise<any>,
+  getNextPage: () => any,
 }
 
 interface CustomDatatableState {
@@ -22,7 +22,7 @@ interface CustomDatatableState {
   isLoading: boolean;
 }
 
-export class CustomDatatable extends PureComponent<CustomDatatableProps, CustomDatatableState> {
+export class CustomDatatable extends Component<CustomDatatableProps, CustomDatatableState> {
   state: CustomDatatableState = {
     columns: [],
     items: [],
@@ -39,7 +39,7 @@ export class CustomDatatable extends PureComponent<CustomDatatableProps, CustomD
 
   _datasourceToStateModel() {
     const datasource = this.props.datasource;
-    this.state.columns = each(datasource.columns, (column) => column.sortable = true);
+    this.state.columns = _.each(datasource.columns, (column) => column.sortable = true);
     this.state.items = datasource.rows;
     this.state.csv.filename = moment().toISOString() + datasource.exportName + '.csv';
     this.state.cursor = datasource.cursor;
@@ -48,7 +48,7 @@ export class CustomDatatable extends PureComponent<CustomDatatableProps, CustomD
 
   _afterPageUpdate() {
     const datatable = this.props.datasource;
-    const columns = each(datatable.columns, (column) => column.sortable = true);
+    const columns = _.each(datatable.columns, (column) => column.sortable = true);
     const items = datatable.rows;
     const filename = moment().toISOString() + datatable.exportName + '.csv';
     const cursor = datatable.cursor;
@@ -76,8 +76,8 @@ export class CustomDatatable extends PureComponent<CustomDatatableProps, CustomD
     // escape each cell in each row
     if (this.state.items && this.state.columns) {
       const csvRows = this.state.items.map(function (row) {
-        if (isObject(row)) {
-          row = toArray(row);
+        if (_.isObject(row)) {
+          row = _.toArray(row);
         }
         return row.map(escape);
       });
@@ -119,7 +119,8 @@ export class CustomDatatable extends PureComponent<CustomDatatableProps, CustomD
           </EuiButton>
         </EuiFlexItem>
 
-      </EuiFlexGroup>);
+      </EuiFlexGroup>
+    );
   }
 
   render() {

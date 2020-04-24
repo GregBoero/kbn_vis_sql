@@ -16,12 +16,14 @@ const setupPlugins: Readonly<SqlVisPluginSetupDependencies> = {
   expressions: npSetup.plugins.expressions,
   data: npSetup.plugins.data,
   visualizations: visualizationsSetup,
+  uiSettings:npSetup.core.uiSettings,
 };
 
 const startPlugins: Readonly<SqlVisPluginStartDependencies> = {
   expressions: npStart.plugins.expressions,
   data: npStart.plugins.data,
   visualizations: visualizationsStart,
+
 };
 
 const pluginInstance = plugin({} as PluginInitializerContext);
