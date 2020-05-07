@@ -1,5 +1,5 @@
-import { PluginInitializerContext } from 'kibana/public';
 import { npSetup, npStart } from 'ui/new_platform';
+import { PluginInitializerContext } from 'kibana/public';
 
 import { plugin } from '.';
 

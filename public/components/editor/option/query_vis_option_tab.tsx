@@ -3,6 +3,7 @@ import _ from 'lodash';
 import {EuiForm, EuiFormRow, EuiSelect, EuiSpacer, EuiSwitch, EuiSwitchEvent,} from '@elastic/eui';
 import {QueryVisParams} from '../query/query_controls_tab';
 import {VisOptionsProps} from "ui/vis/editors/default";
+import {getAvailableVisType} from "../../../../common/SqlVIsOptionHelper";
 
 type QueryVisOptionTabProps =
   Pick<VisOptionsProps<QueryVisParams>, 'vis' | 'stateParams' | 'setValue'> & {
@@ -10,7 +11,7 @@ type QueryVisOptionTabProps =
 }
 
 export class QueryVisOptionTab extends Component<QueryVisOptionTabProps, QueryVisParams> {
-  options = [{value: 'datatable', text: 'DataTables'}, {value: 'metric', text: 'Metric'}];
+  options = getAvailableVisType();
 
   constructor(props: QueryVisOptionTabProps, context: any) {
     super(props, context);

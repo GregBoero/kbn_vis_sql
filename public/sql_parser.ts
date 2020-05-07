@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import {submitRequest} from './service/sql_api_service'
 // @ts-ignore
-import {notify} from '../../../x-pack/legacy/plugins/canvas/public/lib/notify'
+import {toastNotifications} from 'ui/notify';
 // @ts-ignore
 import {TimeCache} from "../../../src/legacy/core_plugins/vis_type_vega/public/data_model/time_cache";
 import {DslQuery} from 'src/plugins/data/common/es_query/kuery';
@@ -14,7 +14,6 @@ export type FilterDslType = { bool: { must: DslQuery[]; filter: esFilters.Filter
 export class SqlParser {
 
   constructor(public query: string, public useTimeFilter: boolean, public visType: string, public filters: FilterDslType, public timeCache: TimeCache) {
-
   }
 
   async parseAsync(): Promise<any> {
@@ -25,20 +24,23 @@ export class SqlParser {
         const statusCode = err.response && err.response.status;
         switch (statusCode) {
           case 400:
-            return notify.error(err.response, {
+            return toastNotifications.addError(err.response, {
               title: `Couldn't request to Elasticsearch`,
             });
           case 413:
-            return notify.error(
-              `The server gave a response that the request data was too large. This
+            return toastNotifications.addError({
+                name: 'Request data was too large',
+                message: `The server gave a response that the request data was too large. This
               usually means uploaded image assets that are too large for Kibana or
-              a proxy. Try removing some assets in the asset manager.`,
+              a proxy. Try removing some assets in the asset manager.`
+              }
+              ,
               {
                 title: `Couldn't get the data from Elasticsearch`,
               }
             );
           default:
-            return notify.error(err, {
+            return toastNotifications.addError(err, {
               title: `Couldn't get the data`,
             });
         }
@@ -58,8 +60,6 @@ export class SqlParser {
     }
     return parsedQuery;
   }
-
-
 }
 
 

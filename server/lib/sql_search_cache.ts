@@ -80,6 +80,7 @@ export class SqlSearchCache {
       requestObject = await this._createRequestObject(request.payload.sqlQuery, request.headers);
     }
 
+    console.debug("requested VisType : " + request.payload.visType);
     return this.esClient(request, 'transport.request', requestObject).then((res: any) => {
       return this._handleDataVisType(res, request.payload.visType)
     }).catch((e: any) => {
@@ -106,8 +107,7 @@ export class SqlSearchCache {
         resObject.data = await this._responseToMetrics(response);
         break;
       default:
-        resObject.data = "Unsupported Vis Type";
-        break;
+        throw new Error(`Unsupported Vis Type`);
     }
     return resObject;
   }
@@ -116,6 +116,8 @@ export class SqlSearchCache {
     if (!response.columns) {
       const rows = response.rows;
       const cursor = response.cursor;
+      console.debug('requested row : ' + rows);
+      console.debug('requested cursor : ' + cursor);
       return {rows, cursor,};
     }
 
@@ -125,7 +127,9 @@ export class SqlSearchCache {
     const columnIds: Array<any> = map(columns, 'field');
     const rows = response.rows.map((row: any) => zipObject(columnIds, row));
     const cursor = response.cursor;
-
+    console.debug('requested column : ' + columns);
+    console.debug('requested row : ' + rows);
+    console.debug('requested cursor : ' + cursor);
     return {columns, rows, cursor,};
   }
 

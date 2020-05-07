@@ -1,9 +1,11 @@
 import {SqlVisDependencies} from "./plugin";
-import {defaultFeedbackMessage, Status} from '../../../src/legacy/core_plugins/visualizations/public/index';
+import {Status} from '../../../src/legacy/core_plugins/visualizations/public/index';
 import {SqlRequestHandlerProvider} from "./sql_request_handler_provider";
 import {QueryControlsTab} from "./components/editor/query/query_controls_tab";
 import {QueryVisOptionTab} from "./components/editor/option/query_vis_option_tab";
 import {SqlVisController} from "./vis_controller";
+import {defaultFeedbackMessage} from "../common/feedback_message";
+import {DATATABLE_TYPE} from "../common/SqlVIsOptionHelper";
 
 export function createSqlVisTypeDefinition(deps: SqlVisDependencies) {
 
@@ -33,7 +35,7 @@ export function createSqlVisTypeDefinition(deps: SqlVisDependencies) {
     visConfig: {
       defaults: {
         query: '',
-        visType: 'datatable',
+        visType: DATATABLE_TYPE.value,
         useTimeFilter: false,
         isLoading: true,
         exportName: 'default',
