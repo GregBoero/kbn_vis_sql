@@ -1,13 +1,10 @@
-import {Component} from 'react';
+import React, {Component} from 'react';
 // @ts-ignore
 import {saveAs} from '@elastic/filesaver'
-import { EuiInMemoryTable } from '@elastic/eui';
+import {EuiButton, EuiFlexGroup, EuiFlexItem, EuiInMemoryTable} from '@elastic/eui';
 import moment from 'moment';
 import _ from 'lodash';
-import React from 'react';
-import { EuiFlexGroup } from '@elastic/eui';
-import { EuiFlexItem } from '@elastic/eui';
-import { EuiButton } from '@elastic/eui';
+
 
 interface CustomDatatableProps {
   datasource: any,

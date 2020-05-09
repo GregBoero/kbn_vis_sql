@@ -1,7 +1,8 @@
-import {ExpressionFunction, KibanaDatatable, Render,} from '../../../src/plugins/expressions/public';
+
 import {SqlRequestHandlerProvider} from './sql_request_handler_provider';
 import {get} from 'lodash';
 import {SqlVisDependencies} from "./plugin";
+import {ExpressionFunctionDefinition, KibanaDatatable, Render} from "../common/import";
 
 const name = 'kbn_vis_sql';
 
@@ -14,18 +15,18 @@ interface Arguments {
 type VisParams = Required<Arguments>;
 
 interface RenderValue {
-  visType: 'kbn_vis_sql';
+  visType: string;
   visConfig: VisParams;
 }
 
 type Return = Promise<Render<RenderValue>>;
 
 
-export const createSqlVisFn = (deps: Readonly<SqlVisDependencies>): ExpressionFunction<typeof name,
+export const createSqlVisFn = (deps: Readonly<SqlVisDependencies>): ExpressionFunctionDefinition<typeof name,
   Context,
   Arguments,
   Return> => ({
-  name: 'kbn_vis_sql',
+  name,
   type: 'render',
   context: {
     types: [],
@@ -49,13 +50,11 @@ export const createSqlVisFn = (deps: Readonly<SqlVisDependencies>): ExpressionFu
       visParams: params
     });
 
-    response.visType = 'kbn_vis_sql';
-
     return {
       type: 'render',
       as: 'visualization',
       value: {
-        visType: 'kbn_vis_sql',
+        visType: name,
         visConfig: params,
         visData: response
       },

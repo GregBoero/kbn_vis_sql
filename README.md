@@ -19,7 +19,8 @@
 
 | Kibana version| Compatible    | check          | 
 |:-------------:|:-------------:|:-------------: |
-| 7.6.2         |      YES      |    YES         | 
+| < 7.8.0       |      NO       |    YES         | 
+| 7.8.0         |      YES      |    YES         | 
 
 
 

@@ -1,40 +1,36 @@
-import LruCache from 'lru-cache';
+import LRUCache from 'lru-cache';
 import {camelCase, map, zipObject} from 'lodash';
-// @ts-ignore
-import {sanitizeName} from '../../../../x-pack/legacy/plugins/canvas/server/lib/sanitize_name';
-// @ts-ignore
-import {normalizeType} from '../../../../x-pack/legacy/plugins/canvas/server/lib/normalize_type';
-import {Legacy} from "kibana";
-import {CallClusterWithRequest} from "../../../../src/legacy/core_plugins/elasticsearch";
+import {IScopedClusterClient, KibanaRequest} from "kibana/server";
 
 
 export class SqlSearchCache {
-  private _cache: LruCache<string, any>;
+  private _cache: LRUCache<string, any>;
   private filters: string = '';
 
-  constructor(public esClient: CallClusterWithRequest, cacheOpts: LruCache.Options<string, any>) {
-    this._cache = new LruCache(cacheOpts);
+  constructor(cacheOpts: LRUCache.Options<string, any>) {
+    this._cache = new LRUCache(cacheOpts);
   }
 
 
   /**
    * Execute multiple searches, possibly combining the results of the cached searches
    * with the new ones already in cache
+   * @param esClient
    * @param {object} request the request
    */
-  search = (request: Legacy.Request) => {
+  search = (esClient: IScopedClusterClient, request: KibanaRequest<unknown, unknown, unknown, "post">): Promise<any> => {
     //TODO fix ts-ignore with a real object
-    const payload = request.payload;
+    const body = request.body;
     // @ts-ignore
-    if (payload.filters) {
+    if (body.filters) {
       // @ts-ignore
-      this.filters = payload.filters;
+      this.filters = body.filters;
     }
 
-    const key = JSON.stringify(payload);
+    const key = JSON.stringify(body);
     let pending = this._cache.get(key);
     if (pending === undefined) {
-      pending = this._fetchSqlData(request);
+      pending = this._fetchSqlData(esClient, request);
       this._cache.set(key, pending);
     }
 
@@ -67,32 +63,24 @@ export class SqlSearchCache {
   };
 
 
-  async _fetchSqlData(request: any) {
+  async _fetchSqlData(esClient: IScopedClusterClient, request: any) {
 
     let requestObject;
     // the received request is for the next page
-    if (request.payload.cursor) {
-      console.debug("Create a cursor update cursor :" + request.payload.cursor);
-      requestObject = await this._createRequestCursorObject(request.payload.cursor, request.headers);
-      request.payload.visType = 'datatable';
+    if (request.body.cursor) {
+      console.debug("Create a cursor update cursor :" + request.body.cursor);
+      requestObject = await this._createRequestCursorObject(request.body.cursor, request.headers);
+      request.body.visType = 'datatable';
     } else {
-      console.debug("Create an SQL request query : " + request.payload.sqlQuery);
-      requestObject = await this._createRequestObject(request.payload.sqlQuery, request.headers);
+      console.debug("Create an SQL request query : " + request.body.sqlQuery);
+      requestObject = await this._createRequestObject(request.body.sqlQuery, request.headers);
     }
 
-    console.debug("requested VisType : " + request.payload.visType);
-    return this.esClient(request, 'transport.request', requestObject).then((res: any) => {
-      return this._handleDataVisType(res, request.payload.visType)
-    }).catch((e: any) => {
-      if (e.message.indexOf('parsing_exception') > -1) {
-        throw new Error(
-          `Couldn't parse Elasticsearch SQL query. You may need to add double quotes to names containing special characters. Check your query and try again. Error: ${
-            e.message
-          }`
-        );
-      }
-      throw new Error(`Unexpected error from Elasticsearch: ${e.message}`);
-    });
+    console.debug("requested VisType : " + request.body.visType);
+    return esClient.callAsCurrentUser('transport.request', requestObject)
+      .then((res: any) => {
+        return this._handleDataVisType(res, request.body.visType)
+      }).catch((e: any) => Promise.reject(e));
   }
 
 
@@ -122,8 +110,13 @@ export class SqlSearchCache {
     }
 
     const columns = response.columns.map(({name, type}: any) => {
-      return {field: camelCase(sanitizeName(name)), name: sanitizeName(name), dataType: normalizeType(type)};
+      return {
+        field: camelCase(this.sanitizeName(name)),
+        name: this.sanitizeName(name),
+        dataType: this.normalizeType(type)
+      };
     });
+
     const columnIds: Array<any> = map(columns, 'field');
     const rows = response.rows.map((row: any) => zipObject(columnIds, row));
     const cursor = response.cursor;
@@ -135,6 +128,47 @@ export class SqlSearchCache {
 
   async _responseToMetrics(response: any) {
     return {count: 10};
+  }
+
+  normalizeType(type: any) {
+    const normalTypes = {
+      string: ['string', 'text', 'keyword', '_type', '_id', '_index', 'geo_point'],
+      number: [
+        'float',
+        'half_float',
+        'scaled_float',
+        'double',
+        'integer',
+        'long',
+        'short',
+        'byte',
+        'token_count',
+        '_version',
+      ],
+      date: ['date', 'datetime'],
+      boolean: ['boolean'],
+      null: ['null'],
+    };
+
+    // @ts-ignore
+    const normalizedType = Object.keys(normalTypes).find((t) => normalTypes[t].includes(type));
+
+    if (normalizedType) {
+      return normalizedType;
+    }
+    throw new Error(`Canvas does not yet support type: ${type}`);
+  }
+
+  sanitizeName(name: string) {
+    // blacklisted characters
+    const blacklist = ['(', ')'];
+    const pattern = blacklist.map((v) => this.escapeRegExp(v)).join('|');
+    const regex = new RegExp(pattern, 'g');
+    return name.replace(regex, '_');
+  }
+
+  escapeRegExp(string: string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
 }

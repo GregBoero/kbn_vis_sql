@@ -1,6 +1,6 @@
 import {sqlSearch} from './sql_search';
-import {Legacy} from "kibana";
+import {IRouter} from "kibana/server";
 
-export function routes(server: Legacy.Server) {
+export function routes(server: IRouter) {
   sqlSearch(server);
 }

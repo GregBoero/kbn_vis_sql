@@ -1,26 +1,43 @@
 import {SqlSearchCache} from "../lib/sql_search_cache";
 import {API_ROUTE_SQL} from '../../common/constants';
-import boom from "boom";
-import {Legacy} from "kibana";
+import Boom from 'boom';
+import {IRouter} from "kibana/server";
+import {schema} from "@kbn/config-schema";
 
 
-export function sqlSearch(server: Legacy.Server) {
-  const {callWithRequest} = server.plugins.elasticsearch.getCluster('data');
-  const searchCache = new SqlSearchCache(callWithRequest, {max: 10, maxAge: 4 * 1000});
+export function sqlSearch(router: IRouter) {
   const routePrefix = API_ROUTE_SQL;
+  const sqlCache = new SqlSearchCache({
+    max: 10,
+    maxAge: 4 * 1000
+  });
 
+  // options: { payload: {allow: 'application/json', maxBytes: 26214400}},
 
   // search => execute sql query
-  server.route({
-    options: {payload: {allow: 'application/json', maxBytes: 26214400}},
-    handler: request => {
-      if (!request.payload) {
-        return Promise.reject(boom.badRequest('A query payload is required'));
-      }
-      return searchCache.search(request);
-
+  router.post(
+    {
+      validate: {
+        body: schema.object({
+          filters: schema.maybe(schema.any()),
+          sqlQuery: schema.maybe(schema.string()),
+          visType: schema.maybe(schema.string()),
+          cursor: schema.maybe(schema.string())
+        })
+      },
+      path: routePrefix
     },
-    method: 'POST',
-    path: routePrefix,
-  });
+    async (context, request, res) => {
+      if (!request.body) {
+        return Promise.reject(Boom.badRequest('A query payload is required'));
+      }
+      const {dataClient} = context.core.elasticsearch;
+      //FIXME remove the call to the new not more required
+      return sqlCache.search(dataClient, request)
+        .then(value => res.ok({
+          body: value,
+        }))
+        .catch((err: any) => res.badRequest(err));
+    }
+  );
 }

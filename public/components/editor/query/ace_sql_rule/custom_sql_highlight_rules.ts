@@ -1,5 +1,6 @@
 import ace from 'brace';
-import {ElasticsearchSqlHighlightRules} from "../../../../../../../src/legacy/core_plugins/console/public/np_ready/application/models/legacy_core_editor/mode/elasticsearch_sql_highlight_rules";
+import {ElasticsearchSqlHighlightRules} from "../../../../../common/import";
+
 
 // const oop = ace.acequire('ace/lib/oop');
 const TextMode = ace.acequire('ace/mode/text').Mode;

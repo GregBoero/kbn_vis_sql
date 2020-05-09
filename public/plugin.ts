@@ -1,27 +1,27 @@
 import {CoreSetup, CoreStart, IUiSettingsClient, Plugin, PluginInitializerContext} from 'kibana/public';
-import {DataPublicPluginSetup, DataPublicPluginStart} from "../../../src/plugins/data/public";
-import {Plugin as ExpressionsPublicPlugin} from '../../../src/plugins/expressions/public';
-import {
-  VisualizationsSetup,
-  VisualizationsStart
-} from "../../../src/legacy/core_plugins/visualizations/public/np_ready/public";
+
 import {createSqlVisFn} from "./sql_vis_fn";
 import {createSqlVisTypeDefinition} from "./sql_vis_type";
+import {
+  DataPublicPluginSetup,
+  DataPublicPluginStart,
+  ExpressionsPublicPlugin,
+  VisualizationsSetup,
+} from "../common/import";
 
-/** @internal */
-export interface SqlVisPluginStartDependencies {
-  expressions: ReturnType<ExpressionsPublicPlugin['start']>;
-  visualizations: VisualizationsStart;
-  data: DataPublicPluginStart;
 
-}
-
-type FilterVisCoreSetup = CoreSetup<SqlVisPluginStartDependencies>;
+type FilterVisCoreSetup = CoreSetup<SqlVisPluginStartDependencies, void>;
 
 export interface SqlVisDependencies {
   core: FilterVisCoreSetup;
   data: DataPublicPluginSetup;
   uiSettings: IUiSettingsClient;
+}
+
+/** @internal */
+export interface SqlVisPluginStartDependencies {
+  expressions: ReturnType<ExpressionsPublicPlugin['start']>;
+  data: DataPublicPluginStart;
 }
 
 /** @internal */
@@ -33,26 +33,21 @@ export interface SqlVisPluginSetupDependencies {
 }
 
 
-export class SqlVisPlugin implements Plugin<Promise<void>, void> {
-  constructor(public initializerContext: PluginInitializerContext) {
+export class SqlVisPlugin implements Plugin<Promise<void>, void, SqlVisPluginSetupDependencies> {
+  constructor(initializerContext: PluginInitializerContext) {
   }
 
-  public async setup(
-    core: FilterVisCoreSetup,
-    {expressions, visualizations, data,uiSettings}: SqlVisPluginSetupDependencies
-  ) {
-    const visualizationDependencies: Readonly<SqlVisDependencies> = {
-      core,
-      data,
-      uiSettings
-    };
-    expressions.registerFunction(() => createSqlVisFn(visualizationDependencies));
-    visualizations.types.createBaseVisualization(
-      createSqlVisTypeDefinition(visualizationDependencies)
-    );
+  async setup(core: FilterVisCoreSetup, plugins: SqlVisPluginSetupDependencies) {
+    const {expressions, visualizations, data, uiSettings} = plugins;
+    const deps: Readonly<SqlVisDependencies> = {core, data, uiSettings};
+    expressions.registerFunction(() => createSqlVisFn(deps));
+    visualizations.createBaseVisualization(createSqlVisTypeDefinition(deps));
   }
 
-  public start(core: CoreStart, deps: SqlVisPluginStartDependencies) {
-    // nothing to do here
+  start(core: CoreStart, plugins: SqlVisPluginSetupDependencies): Promise<void> | void {
   }
+
+
 }
+
+
