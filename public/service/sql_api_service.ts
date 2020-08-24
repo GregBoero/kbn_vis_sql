@@ -1,11 +1,12 @@
 import {fetch} from '../../common/lib/fetch';
 import {API_ROUTE_SQL} from '../../common/constants';
 import {CoreSetup} from "kibana/public";
+import { getNotifications } from '../service';
 
 
 export function submitRequest(core: CoreSetup, sqlQuery: any) {
   const apiPath = core.http.basePath.get() + `${API_ROUTE_SQL}`;
-  const toastNotifications = core.notifications.toasts;
+  const toastNotifications = getNotifications().toasts;
   return fetch.post(`${apiPath}`, {...sqlQuery}).then(results => {
     return results.data
   }).catch(err => {

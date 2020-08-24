@@ -1,6 +1,6 @@
 import LRUCache from 'lru-cache';
 import {camelCase, map, zipObject} from 'lodash';
-import {IScopedClusterClient, KibanaRequest} from "kibana/server";
+import {ILegacyScopedClusterClient, KibanaRequest} from "kibana/server";
 
 
 export class SqlSearchCache {
@@ -18,7 +18,7 @@ export class SqlSearchCache {
    * @param esClient
    * @param {object} request the request
    */
-  search = (esClient: IScopedClusterClient, request: KibanaRequest<unknown, unknown, unknown, "post">): Promise<any> => {
+  search = (esClient: ILegacyScopedClusterClient, request: KibanaRequest<unknown, unknown, unknown, "post">): Promise<any> => {
     //TODO fix ts-ignore with a real object
     const body = request.body;
     // @ts-ignore
@@ -63,7 +63,7 @@ export class SqlSearchCache {
   };
 
 
-  async _fetchSqlData(esClient: IScopedClusterClient, request: any) {
+  async _fetchSqlData(esClient: ILegacyScopedClusterClient, request: any) {
 
     let requestObject;
     // the received request is for the next page

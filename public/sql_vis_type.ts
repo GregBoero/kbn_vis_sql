@@ -6,6 +6,8 @@ import {QueryVisOptionTab} from "./components/editor/option/query_vis_option_tab
 import {createSqlVisController} from "./vis_controller";
 import {defaultFeedbackMessage} from "../common/feedback_message";
 import {DATATABLE_TYPE} from "../common/SqlVIsOptionHelper";
+import {DefaultEditorSize} from '../common/import';
+
 
 export function createSqlVisTypeDefinition(deps: SqlVisDependencies) {
 
@@ -13,10 +15,11 @@ export function createSqlVisTypeDefinition(deps: SqlVisDependencies) {
   const visController = createSqlVisController(deps);
 
   return {
-    name: 'kbnVisSql',
+    name: 'kbn_vis_sql',
+    type: 'table',
     title: 'Sql query Visualisation',
     description: 'Create Visualisation for Sql Query .',
-    icon: 'visTimelion',
+    icon: 'visTable',
     stage: 'experimental',
     feedbackMessage: defaultFeedbackMessage,
     options: {
@@ -35,6 +38,8 @@ export function createSqlVisTypeDefinition(deps: SqlVisDependencies) {
       },
     },
     editorConfig: {
+      enableAutoApply: false,
+      defaultSize: DefaultEditorSize.MEDIUM,
       optionTabs: [
         {
           name: 'query_controls',

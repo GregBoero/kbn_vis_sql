@@ -1,5 +1,3 @@
-// @ts-ignore
-import {TimeCache} from "../../../src/plugins/vis_type_vega/public/data_model/time_cache";
 import {Vis, VisParams, VisualizationsSetup, VisualizationsStart} from "../../../src/plugins/visualizations/public";
 import {
   DataPublicPluginSetup,
@@ -7,28 +5,41 @@ import {
   esQuery,
   Filter,
   Query,
-  TimeRange,
+  TimeRange
 } from '../../../src/plugins/data/public';
-
+import {
+  NotificationsStart,
+  IUiSettingsClient,
+  SavedObjectsStart,
+} from '../../../src/core/public'
+import {DslQuery} from '../../../src/plugins/data/common/';
 import {VisOptionsProps} from "../../../src/plugins/vis_default_editor/public";
-import {ElasticsearchSqlHighlightRules} from "../../../src/plugins/es_ui_shared/public/console_lang/ace/modes/lexer_rules";
+import {ElasticsearchSqlHighlightRules} from "../../../src/plugins/es_ui_shared/public";
 import {
   ExpressionFunctionDefinition,
   KibanaDatatable,
   Plugin as ExpressionsPublicPlugin,
-  Render
+  Render,
+  KibanaContext
 } from '../../../src/plugins/expressions/public';
-import {DslQuery} from '../../../src/plugins/data/common/es_query/kuery';
+import { DefaultEditorSize } from '../../../src/plugins/vis_default_editor/public';
+
+import {createGetterSetter} from '../../../src/plugins/kibana_utils/public';
+
 
 export {
-  TimeCache,
   VisParams, Vis, VisualizationsSetup, VisualizationsStart,
   Filter, esQuery, Query, TimeRange, DslQuery,
   VisOptionsProps,
   ElasticsearchSqlHighlightRules,
   DataPublicPluginStart, DataPublicPluginSetup,
+  NotificationsStart,
+  IUiSettingsClient,
+  SavedObjectsStart,
   ExpressionsPublicPlugin,
 
-  ExpressionFunctionDefinition, KibanaDatatable, Render,
+  ExpressionFunctionDefinition, KibanaDatatable, Render,KibanaContext,
+  DefaultEditorSize,
+  createGetterSetter
 };
 

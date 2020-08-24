@@ -4,6 +4,7 @@ import {get} from 'lodash';
 import {SqlVisDependencies} from "./plugin";
 import {ExpressionFunctionDefinition, KibanaDatatable, Render} from "../common/import";
 
+
 const name = 'kbn_vis_sql';
 
 type Context = KibanaDatatable;
@@ -22,15 +23,12 @@ interface RenderValue {
 type Return = Promise<Render<RenderValue>>;
 
 
-export const createSqlVisFn = (deps: Readonly<SqlVisDependencies>): ExpressionFunctionDefinition<typeof name,
-  Context,
-  Arguments,
-  Return> => ({
+export const createSqlVisFn = (
+  deps: Readonly<SqlVisDependencies>
+): ExpressionFunctionDefinition<typeof name, Context,  Arguments,  Return> => ({
   name,
   type: 'render',
-  context: {
-    types: [],
-  },
+  inputTypes: ['kibana_datatable'],
   help: 'Sql visualization',
   args: {
     visConfig: {

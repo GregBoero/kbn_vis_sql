@@ -1,12 +1,18 @@
 import {Observable} from "rxjs";
-import {kbnVisSqlServerConfig} from "./config";
-import {CoreSetup, CoreStart, Logger, Plugin, PluginInitializerContext} from 'kibana/server';
+import {
+  CoreSetup,
+  CoreStart,
+  Logger,
+  Plugin,
+  PluginInitializerContext
+} from 'kibana/server';
 import {routes} from "./routes";
+import {kbnVisSqlConfig} from "../common/config";
 
 
 export class kbnVisSqlServer implements Plugin {
   // @ts-ignore
-  private readonly config$: Observable<kbnVisSqlServerConfig>;
+  private readonly config$: Observable<kbnVisSqlConfig>;
   private readonly log: Logger;
 
   // @ts-ignore

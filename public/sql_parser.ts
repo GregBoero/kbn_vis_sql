@@ -1,7 +1,8 @@
 import _ from 'lodash';
 import moment from 'moment';
 import {submitRequest} from './service/sql_api_service'
-import {DslQuery, Filter, TimeCache} from "../common/import";
+import {DslQuery, Filter} from "../common/import";
+import {TimeCache} from "../common/time_cache";
 
 
 export type FilterDslType = { bool: { must: DslQuery[]; filter: Filter[]; should: never[]; must_not: Filter[]; }; }

@@ -31,9 +31,9 @@ export function sqlSearch(router: IRouter) {
       if (!request.body) {
         return Promise.reject(Boom.badRequest('A query payload is required'));
       }
-      const {dataClient} = context.core.elasticsearch;
+      const {client} = context.core.elasticsearch.legacy;
       //FIXME remove the call to the new not more required
-      return sqlCache.search(dataClient, request)
+      return sqlCache.search(client, request)
         .then(value => res.ok({
           body: value,
         }))

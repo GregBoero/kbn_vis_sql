@@ -8,6 +8,8 @@ import {
   ExpressionsPublicPlugin,
   VisualizationsSetup,
 } from "../common/import";
+import {kbnVisSqlConfig} from "../common/config";
+import {setData, setNotifications, setUISettings} from './service';
 
 
 type FilterVisCoreSetup = CoreSetup<SqlVisPluginStartDependencies, void>;
@@ -34,17 +36,25 @@ export interface SqlVisPluginSetupDependencies {
 
 
 export class SqlVisPlugin implements Plugin<Promise<void>, void, SqlVisPluginSetupDependencies> {
-  constructor(initializerContext: PluginInitializerContext) {
+  initializerContext: PluginInitializerContext<kbnVisSqlConfig>;
+
+  constructor(initializerContext: PluginInitializerContext<kbnVisSqlConfig>) {
+    this.initializerContext = initializerContext;
   }
+
 
   async setup(core: FilterVisCoreSetup, plugins: SqlVisPluginSetupDependencies) {
     const {expressions, visualizations, data, uiSettings} = plugins;
     const deps: Readonly<SqlVisDependencies> = {core, data, uiSettings};
+
+    setUISettings(uiSettings);
     expressions.registerFunction(() => createSqlVisFn(deps));
     visualizations.createBaseVisualization(createSqlVisTypeDefinition(deps));
   }
 
-  start(core: CoreStart, plugins: SqlVisPluginSetupDependencies): Promise<void> | void {
+  start(core: CoreStart, plugins: SqlVisPluginStartDependencies): Promise<void> | void {
+    setNotifications(core.notifications);
+    setData(plugins.data);
   }
 
 
