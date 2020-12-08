@@ -1,7 +1,8 @@
 import LRUCache from 'lru-cache';
-import {camelCase, map, zipObject} from 'lodash';
-import {ILegacyScopedClusterClient, KibanaRequest} from "kibana/server";
+import { camelCase, map, zipObject } from 'lodash';
+import { ILegacyScopedClusterClient, KibanaRequest } from 'kibana/server';
 
+// TODO replace console.debug by a logger
 
 export class SqlSearchCache {
   private _cache: LRUCache<string, any>;
@@ -11,15 +12,17 @@ export class SqlSearchCache {
     this._cache = new LRUCache(cacheOpts);
   }
 
-
   /**
    * Execute multiple searches, possibly combining the results of the cached searches
    * with the new ones already in cache
    * @param esClient
    * @param {object} request the request
    */
-  search = (esClient: ILegacyScopedClusterClient, request: KibanaRequest<unknown, unknown, unknown, "post">): Promise<any> => {
-    //TODO fix ts-ignore with a real object
+  search = (
+    esClient: ILegacyScopedClusterClient,
+    request: KibanaRequest<unknown, unknown, unknown, 'post'>
+  ): Promise<any> => {
+    // TODO fix ts-ignore with a real object
     const body = request.body;
     // @ts-ignore
     if (body.filters) {
@@ -37,7 +40,6 @@ export class SqlSearchCache {
     return pending;
   };
 
-
   async _createRequestObject(sqlRequest: any, headers: any) {
     return {
       body: {
@@ -45,53 +47,52 @@ export class SqlSearchCache {
         query: sqlRequest,
         fetch_size: 10000,
       },
-      headers: headers,
+      headers,
       method: 'POST',
-      path: '/_xpack/sql?format=json',
-    }
-  };
+      path: '/_sql?format=json',
+    };
+  }
 
   async _createRequestCursorObject(cursorId: string, headers: any) {
     return {
       body: {
         cursor: cursorId,
       },
-      headers: headers,
+      headers,
       method: 'POST',
-      path: '/_xpack/sql?format=json',
-    }
-  };
-
+      path: '/_sql?format=json',
+    };
+  }
 
   async _fetchSqlData(esClient: ILegacyScopedClusterClient, request: any) {
-
     let requestObject;
     // the received request is for the next page
     if (request.body.cursor) {
-      console.debug("Create a cursor update cursor :" + request.body.cursor);
+      // console.debug('Create a cursor update cursor :' + request.body.cursor);
       requestObject = await this._createRequestCursorObject(request.body.cursor, request.headers);
       request.body.visType = 'datatable';
     } else {
-      console.debug("Create an SQL request query : " + request.body.sqlQuery);
+      // console.debug('Create an SQL request query : ' + request.body.sqlQuery);
       requestObject = await this._createRequestObject(request.body.sqlQuery, request.headers);
     }
 
-    console.debug("requested VisType : " + request.body.visType);
-    return esClient.callAsCurrentUser('transport.request', requestObject)
+    // console.debug('requested VisType : ' + request.body.visType);
+    return esClient
+      .callAsCurrentUser('transport.request', requestObject)
       .then((res: any) => {
-        return this._handleDataVisType(res, request.body.visType)
-      }).catch((e: any) => Promise.reject(e));
+        return this._handleDataVisType(res, request.body.visType);
+      })
+      .catch((e: any) => Promise.reject(e));
   }
-
 
   // depending of the visType we format the data correctly
   async _handleDataVisType(response: any, visType: any) {
-    let resObject = {type: visType, data: {}};
+    const resObject = { type: visType, data: {} };
     switch (visType) {
-      case 'datatable' :
+      case 'datatable':
         resObject.data = await this._responseToTable(response);
         break;
-      case 'metric' :
+      case 'metric':
         resObject.data = await this._responseToMetrics(response);
         break;
       default:
@@ -104,30 +105,30 @@ export class SqlSearchCache {
     if (!response.columns) {
       const rows = response.rows;
       const cursor = response.cursor;
-      console.debug('requested row : ' + rows);
-      console.debug('requested cursor : ' + cursor);
-      return {rows, cursor,};
+      // console.debug('requested row : ' + rows);
+      // console.debug('requested cursor : ' + cursor);
+      return { rows, cursor };
     }
 
-    const columns = response.columns.map(({name, type}: any) => {
+    const columns = response.columns.map(({ name, type }: any) => {
       return {
         field: camelCase(this.sanitizeName(name)),
         name: this.sanitizeName(name),
-        dataType: this.normalizeType(type)
+        dataType: this.normalizeType(type),
       };
     });
 
-    const columnIds: Array<any> = map(columns, 'field');
+    const columnIds: any[] = map(columns, 'field');
     const rows = response.rows.map((row: any) => zipObject(columnIds, row));
     const cursor = response.cursor;
-    console.debug('requested column : ' + columns);
-    console.debug('requested row : ' + rows);
-    console.debug('requested cursor : ' + cursor);
-    return {columns, rows, cursor,};
+    // console.debug('requested column : ' + columns);
+    // console.debug('requested row : ' + rows);
+    // console.debug('requested cursor : ' + cursor);
+    return { columns, rows, cursor };
   }
 
   async _responseToMetrics(response: any) {
-    return {count: 10};
+    return { count: 10 };
   }
 
   normalizeType(type: any) {
@@ -170,5 +171,4 @@ export class SqlSearchCache {
   escapeRegExp(string: string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
-
 }

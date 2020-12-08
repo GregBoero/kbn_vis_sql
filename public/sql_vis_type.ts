@@ -10,7 +10,6 @@ import {DefaultEditorSize} from '../common/import';
 
 
 export function createSqlVisTypeDefinition(deps: SqlVisDependencies) {
-
   const visRequestHandler = SqlRequestHandlerProvider(deps);
   const visController = createSqlVisController(deps);
 
@@ -21,7 +20,6 @@ export function createSqlVisTypeDefinition(deps: SqlVisDependencies) {
     description: 'Create Visualisation for Sql Query .',
     icon: 'visTable',
     stage: 'experimental',
-    feedbackMessage: defaultFeedbackMessage,
     options: {
       showIndexSelection: false,
       showQueryBar: true,
@@ -44,14 +42,14 @@ export function createSqlVisTypeDefinition(deps: SqlVisDependencies) {
         {
           name: 'query_controls',
           title: 'Query',
-          editor: QueryControlsTab
+          editor: QueryControlsTab,
         },
         {
           name: 'vis_type',
           title: 'Vis option',
-          editor: QueryVisOptionTab
-        }
-      ]
+          editor: QueryVisOptionTab,
+        },
+      ],
     },
     requestHandler: visRequestHandler,
     responseHandler: 'none',

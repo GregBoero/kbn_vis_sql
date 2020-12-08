@@ -1,16 +1,17 @@
-import React, {ChangeEvent, Component} from 'react';
+import React, { ChangeEvent, Component } from 'react';
 import _ from 'lodash';
-import {EuiForm, EuiFormRow, EuiSelect, EuiSpacer, EuiSwitch, EuiSwitchEvent,} from '@elastic/eui';
+import { EuiForm, EuiFormRow, EuiSelect, EuiSpacer, EuiSwitch, EuiSwitchEvent } from '@elastic/eui';
 
-import {QueryVisParams} from '../query/query_controls_tab';
-import {getAvailableVisType} from "../../../../common/SqlVIsOptionHelper";
-import {VisOptionsProps} from "../../../../common/import";
+import { QueryVisParams } from '../query/query_controls_tab';
+import { getAvailableVisType } from '../../../../common/SqlVIsOptionHelper';
+import { VisOptionsProps } from '../../../../common/import';
 
-
-type QueryVisOptionTabProps =
-  Pick<VisOptionsProps<QueryVisParams>, 'vis' | 'stateParams' | 'setValue'> & {
+type QueryVisOptionTabProps = Pick<
+  VisOptionsProps<QueryVisParams>,
+  'vis' | 'stateParams' | 'setValue'
+> & {
   stateParams: any;
-}
+};
 
 export class QueryVisOptionTab extends Component<QueryVisOptionTabProps, QueryVisParams> {
   options = getAvailableVisType();
@@ -45,7 +46,7 @@ export class QueryVisOptionTab extends Component<QueryVisOptionTabProps, QueryVi
             onChange={this.handleVisTypeChange}
           />
         </EuiFormRow>
-        <EuiSpacer size="m"/>
+        <EuiSpacer size="m" />
 
         <EuiFormRow
           id={`vis-use-time`}
@@ -57,10 +58,10 @@ export class QueryVisOptionTab extends Component<QueryVisOptionTabProps, QueryVi
             checked={this.props.stateParams.useTimeFilter}
             onChange={this.handleUseTimeFilterChange}
             data-test-subj="useAllOption"
-            id=""/>
+            id=""
+          />
         </EuiFormRow>
       </EuiForm>
     );
   }
 }
-

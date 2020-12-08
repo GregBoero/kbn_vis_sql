@@ -1,16 +1,9 @@
-import {Observable} from "rxjs";
-import {
-  CoreSetup,
-  CoreStart,
-  Logger,
-  Plugin,
-  PluginInitializerContext
-} from 'kibana/server';
-import {routes} from "./routes";
-import {kbnVisSqlConfig} from "../common/config";
+import { Observable } from 'rxjs';
+import { CoreSetup, CoreStart, Logger, Plugin, PluginInitializerContext } from 'kibana/server';
+import { routes } from './routes';
+import { kbnVisSqlConfig } from '../common/config';
 
-
-export class kbnVisSqlServer implements Plugin {
+export class KbnVisSqlServer implements Plugin {
   // @ts-ignore
   private readonly config$: Observable<kbnVisSqlConfig>;
   private readonly log: Logger;
@@ -23,12 +16,11 @@ export class kbnVisSqlServer implements Plugin {
 
   setup(core: CoreSetup<object, unknown>, plugins: object): Promise<void> | void {
     const router = core.http.createRouter();
-    this.log.info("set the router route");
+    this.log.info('set the router route');
     routes(router);
   }
 
   start(core: CoreStart, plugins: object): Promise<void> | void {
     return undefined;
   }
-
 }

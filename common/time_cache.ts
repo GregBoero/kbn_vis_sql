@@ -1,4 +1,4 @@
-import {TimefilterContract, TimeRange} from 'src/plugins/data/public';
+import { TimefilterContract, TimeRange } from 'src/plugins/data/public';
 import { TimeRangeBounds } from 'src/plugins/data/common';
 
 /*
@@ -34,69 +34,68 @@ export class TimeCache {
   _maxAge = 0;
   _cachedBounds: TimeRangeBounds | null = null;
   _cacheTS = 0;
-      _timeRange: TimeRange | null = null;
+  _timeRange: TimeRange | null = null;
 
-    constructor(timeFilter: TimefilterContract, maxAge: number) {
-      this._timeFilter = timeFilter;
-      this._maxAge = maxAge;
+  constructor(timeFilter: TimefilterContract, maxAge: number) {
+    this._timeFilter = timeFilter;
+    this._maxAge = maxAge;
+  }
 
-    }
+  // Simplifies unit testing
+  // noinspection JSMethodCanBeStatic
+  _now() {
+    return Date.now();
+  }
 
-    // Simplifies unit testing
-    // noinspection JSMethodCanBeStatic
-    _now() {
-      return Date.now();
-    }
+  /**
+   * Get cached time range values
+   * @returns {{min: number, max: number}}
+   */
+  getTimeBounds() {
+    const ts = this._now();
 
-    /**
-     * Get cached time range values
-     * @returns {{min: number, max: number}}
-     */
-    getTimeBounds() {
-      const ts = this._now();
+    let bounds;
+    if (this._cachedBounds && this._cachedBounds.min && this._cachedBounds.max) {
+      const diff = ts - this._cacheTS;
 
-      let bounds;
-      if (this._cachedBounds && this._cachedBounds.min &&  this._cachedBounds.max ) {
-        const diff = ts - this._cacheTS;
-
-        // For very rapid usage (multiple calls within a few milliseconds)
-        // Avoids expensive time parsing
-        if (diff < AlwaysCacheMaxAge) {
-          return this._cachedBounds;
-        }
-
-        // If the time is relative, mode hasn't changed, and time hasn't changed more than maxAge,
-        // return old time to avoid multiple near-identical server calls
-        if (diff < this._maxAge) {
-          bounds = this._getBounds();
-          if (
-            Math.abs(bounds.min - this._cachedBounds.min.valueOf()) < this._maxAge &&
-            Math.abs(bounds.max - this._cachedBounds.max.valueOf()) < this._maxAge
-          ) {
-            return this._cachedBounds;
-          }
-        }
+      // For very rapid usage (multiple calls within a few milliseconds)
+      // Avoids expensive time parsing
+      if (diff < AlwaysCacheMaxAge) {
+        return this._cachedBounds;
       }
 
-      this._cacheTS = ts;
-      this._cachedBounds = bounds || this._getBounds();
-
-      return this._cachedBounds;
+      // If the time is relative, mode hasn't changed, and time hasn't changed more than maxAge,
+      // return old time to avoid multiple near-identical server calls
+      if (diff < this._maxAge) {
+        bounds = this._getBounds();
+        if (
+          Math.abs(bounds.min - this._cachedBounds.min.valueOf()) < this._maxAge &&
+          Math.abs(bounds.max - this._cachedBounds.max.valueOf()) < this._maxAge
+        ) {
+          return this._cachedBounds;
+        }
+      }
     }
 
-    setTimeRange(timeRange: TimeRange) {
-      this._timeRange = timeRange;
-    }
+    this._cacheTS = ts;
+    this._cachedBounds = bounds || this._getBounds();
 
-    /**
-     * Get parsed min/max values
-     * @returns {{min: number, max: number}}
-     * @private
-     */
-    _getBounds() {
-      const bounds = this._timeFilter.calculateBounds(this._timeRange);
-      return {
-        min: bounds.min.valueOf(),
+    return this._cachedBounds;
+  }
+
+  setTimeRange(timeRange: TimeRange) {
+    this._timeRange = timeRange;
+  }
+
+  /**
+   * Get parsed min/max values
+   * @returns {{min: number, max: number}}
+   * @private
+   */
+  _getBounds() {
+    const bounds = this._timeFilter.calculateBounds(this._timeRange);
+    return {
+      min: bounds.min.valueOf(),
       max: bounds.max.valueOf(),
     };
   }
