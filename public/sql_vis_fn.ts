@@ -1,59 +1,59 @@
-
 import {SqlRequestHandlerProvider} from './sql_request_handler_provider';
 import {get} from 'lodash';
 import {SqlVisDependencies} from "./plugin";
 import {ExpressionFunctionDefinition, KibanaDatatable, Render} from "../common/import";
 
 
-const name = 'kbn_vis_sql';
+type Input = KibanaDatatable;
+type Output = Promise<Render<SqlFilterRenderValue>>;
 
-type Context = KibanaDatatable;
-
-interface Arguments {
-  visConfig: string;
+export interface SqlFilterRenderValue {
+  visData: any;
+  visType: 'kbn_vis_sql';
+  visParams: SqlFilterVisParams;
 }
 
-type VisParams = Required<Arguments>;
-
-interface RenderValue {
-  visType: string;
-  visConfig: VisParams;
+export interface SqlFilterVisParams {
+  visParams: string;
 }
 
-type Return = Promise<Render<RenderValue>>;
+
+export declare type SqlFilterExpressionFunctionDefinition = ExpressionFunctionDefinition<"kbn_sql_vis",
+  Input,
+  SqlFilterVisParams,
+  Output>;
 
 
 export const createSqlVisFn = (
   deps: Readonly<SqlVisDependencies>
-): ExpressionFunctionDefinition<typeof name, Context,  Arguments,  Return> => ({
-  name,
+): SqlFilterExpressionFunctionDefinition => ({
+  name: "kbn_sql_vis",
   type: 'render',
-  inputTypes: ['kibana_datatable'],
+  inputTypes: ['kibana_context', "null"],
   help: 'Sql visualization',
   args: {
-    visConfig: {
+    visParams: {
       types: ['string'],
       default: '"{}"',
       help: '',
     },
   },
-  async fn(context, args) {
+  async fn(input, args) {
     const sqlRequestHandler = SqlRequestHandlerProvider(deps);
-    const params = JSON.parse(args.visConfig);
+    const visParams = JSON.parse(args.visParams);
 
     const response = await sqlRequestHandler({
-      timeRange: get(context, 'timeRange'),
-      query: get(context, 'query'),
-      filters: get(context, 'filters'),
-      visParams: params
+      timeRange: get(input, 'timeRange'),
+      query: get(input, 'query'),
+      filters: get(input, 'filters'),
+      visParams
     });
-
     return {
       type: 'render',
-      as: 'visualization',
+      as: 'kbn_vis_sql',
       value: {
-        visType: name,
-        visConfig: params,
+        visType: "kbn_vis_sql",
+        visParams,
         visData: response
       },
     };

@@ -1,33 +1,17 @@
-import React, { Component } from 'react';
-import { InjectedIntlProps } from 'react-intl';
+import React, {Component} from 'react';
 
 import _ from 'lodash';
 // @ts-ignore
-import { EuiCodeEditor, EuiFormRow } from '@elastic/eui';
+import {EuiCodeEditor, EuiFormRow} from '@elastic/eui';
 
-import { CustomSqlMode } from './ace_sql_rule/custom_sql_highlight_rules';
-import { VisOptionsProps } from '../../../../common/import';
+import {CustomSqlMode} from './ace_sql_rule/custom_sql_highlight_rules';
+import {QueryControlsTabProps, QueryVisParams} from 'plugins/kbn_vis_sql/common/import';
 
-export interface QueryVisParams {
-  query: string;
-  visType: string;
-  useTimeFilter: boolean;
-  isLoading: boolean;
-  exportName: string;
-}
 
-export type QueryControlsTabProps = InjectedIntlProps &
-  Pick<VisOptionsProps<QueryVisParams>, 'vis' | 'stateParams' | 'setValue'> & {
-    stateParams: any;
-  };
-
-export class QueryControlsTab extends Component<QueryControlsTabProps> {
+class QueryControlsTab extends Component<QueryControlsTabProps> {
   aceEditor: any;
   helpText: string = '';
 
-  constructor(props: QueryControlsTabProps, context: any) {
-    super(props, context);
-  }
 
   setVisParam<T extends keyof QueryVisParams>(paramName: T, paramValue: QueryVisParams[T]) {
     this.props.setValue(paramName, paramValue);
@@ -94,7 +78,7 @@ export class QueryControlsTab extends Component<QueryControlsTabProps> {
           aria-label="Write your query"
           value={this.props.stateParams.query}
           onChange={this.handleQueryChange}
-          setOptions={{ useWorker: true }}
+          setOptions={{useWorker: true}}
           mode={new CustomSqlMode()}
           wrapEnabled={true}
           showPrintMargin={false}
@@ -106,3 +90,7 @@ export class QueryControlsTab extends Component<QueryControlsTabProps> {
     );
   }
 }
+
+// default export required for React.Lazy
+// eslint-disable-next-line import/no-default-export
+export {QueryControlsTab as default};

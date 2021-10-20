@@ -15,7 +15,7 @@ export class SqlParser {
   async parseAsync(): Promise<any> {
     if (this.query && this.query.length > 0) {
       let parsedQuery = _.clone(this.query);
-      parsedQuery = await this._parseTimeFilter(parsedQuery);
+      parsedQuery = this._parseTimeFilter(parsedQuery);
       return await submitRequest(this.core, {sqlQuery: parsedQuery, filters: this.filters, visType: this.visType});
     }
   }

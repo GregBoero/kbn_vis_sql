@@ -10,9 +10,10 @@ import {
 } from "../common/import";
 import {kbnVisSqlConfig} from "../common/config";
 import {setData, setNotifications, setUISettings} from './service';
+import {getSqlFilterVisRenderer} from "./sql_vis_renderer";
 
 
-type FilterVisCoreSetup = CoreSetup<SqlVisPluginStartDependencies, void>;
+export type FilterVisCoreSetup = CoreSetup<SqlVisPluginStartDependencies, void>;
 
 export interface SqlVisDependencies {
   core: FilterVisCoreSetup;
@@ -49,13 +50,14 @@ export class SqlVisPlugin implements Plugin<Promise<void>, void, SqlVisPluginSet
 
     setUISettings(uiSettings);
     expressions.registerFunction(() => createSqlVisFn(deps));
+    expressions.registerRenderer(getSqlFilterVisRenderer(deps));
     visualizations.createBaseVisualization(createSqlVisTypeDefinition(deps));
   }
 
   start(core: CoreStart, plugins: SqlVisPluginStartDependencies): Promise<void> | void {
     setNotifications(core.notifications);
     setData(plugins.data);
-  }
+  } 
 
 
 }

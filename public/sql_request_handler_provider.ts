@@ -1,10 +1,10 @@
 import {FilterDslType, SqlParser} from './sql_parser';
 import {SqlVisDependencies} from "./plugin";
-import {esQuery, Filter, Query, TimeRange, VisParams} from "../common/import";
+import {getEsQueryConfig, buildEsQuery, Filter, Query, TimeRange, VisParams} from "../common/import";
 import {TimeCache} from "../common/time_cache";
 
-export function SqlRequestHandlerProvider(deps: SqlVisDependencies) {
-  const {core,data} = deps;
+export function SqlRequestHandlerProvider(deps: Readonly<SqlVisDependencies>) {
+  const {core, data} = deps;
   const uiSettings = core.uiSettings;
   const timeCache = new TimeCache(data.query.timefilter.timefilter, 3 * 1000);
 
@@ -13,12 +13,11 @@ export function SqlRequestHandlerProvider(deps: SqlVisDependencies) {
   }): Promise<any> {
     visParams.isLoading = true;
     timeCache.setTimeRange(timeRange);
-    const esQueryConfigs = esQuery.getEsQueryConfig(uiSettings);
+    const esQueryConfigs = getEsQueryConfig(uiSettings);
     console.log("query => ", query);
-    const filtersDsl: FilterDslType = esQuery.buildEsQuery(undefined, query, filters, esQueryConfigs);
+    const filtersDsl: FilterDslType = buildEsQuery(undefined, query, filters, esQueryConfigs);
     const sqlParser = new SqlParser(core, visParams.query, visParams.useTimeFilter, visParams.visType, filtersDsl, timeCache);
     return sqlParser.parseAsync();
-
   };
 
 }

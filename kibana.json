@@ -1,6 +1,6 @@
 {
   "id": "kbnVisSql",
-  "version": "7.10.0",
+  "version": "7.15.0",
   "server": true,
   "ui": true,
   "requiredPlugins": [
@@ -10,6 +10,7 @@
     "visTypeVega",
     "visualizations",
     "visDefaultEditor",
-    "kibanaUtils"
+    "kibanaUtils",
+    "kibanaReact"
   ]
 }

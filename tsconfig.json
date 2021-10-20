@@ -5,6 +5,7 @@
   // tell the TypeScript compiler where to find your source files
   "include": [
     "server/**/*",
-    "public/**/*"
+    "public/**/*",
+    "common/**/*"
   ]
 }
