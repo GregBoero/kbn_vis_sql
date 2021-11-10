@@ -1,9 +1,10 @@
 import {FilterDslType, SqlParser} from './sql_parser';
 import {SqlVisDependencies} from "./plugin";
-import {esQuery, Filter, Query, TimeCache, TimeRange, VisParams} from "../common/import";
+import {esQuery, Filter, Query, TimeRange, VisParams} from "../common/import";
+import {TimeCache} from "../common/time_cache";
 
 export function SqlRequestHandlerProvider(deps: SqlVisDependencies) {
-  const {core, data} = deps;
+  const {core,data} = deps;
   const uiSettings = core.uiSettings;
   const timeCache = new TimeCache(data.query.timefilter.timefilter, 3 * 1000);
 

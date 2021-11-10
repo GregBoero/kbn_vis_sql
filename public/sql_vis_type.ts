@@ -6,19 +6,20 @@ import {QueryVisOptionTab} from "./components/editor/option/query_vis_option_tab
 import {createSqlVisController} from "./vis_controller";
 import {defaultFeedbackMessage} from "../common/feedback_message";
 import {DATATABLE_TYPE} from "../common/SqlVIsOptionHelper";
+import {DefaultEditorSize} from '../common/import';
+
 
 export function createSqlVisTypeDefinition(deps: SqlVisDependencies) {
-
   const visRequestHandler = SqlRequestHandlerProvider(deps);
   const visController = createSqlVisController(deps);
 
   return {
-    name: 'kbnVisSql',
+    name: 'kbn_vis_sql',
+    type: 'table',
     title: 'Sql query Visualisation',
     description: 'Create Visualisation for Sql Query .',
-    icon: 'visTimelion',
+    icon: 'visTable',
     stage: 'experimental',
-    feedbackMessage: defaultFeedbackMessage,
     options: {
       showIndexSelection: false,
       showQueryBar: true,
@@ -35,18 +36,20 @@ export function createSqlVisTypeDefinition(deps: SqlVisDependencies) {
       },
     },
     editorConfig: {
+      enableAutoApply: false,
+      defaultSize: DefaultEditorSize.MEDIUM,
       optionTabs: [
         {
           name: 'query_controls',
           title: 'Query',
-          editor: QueryControlsTab
+          editor: QueryControlsTab,
         },
         {
           name: 'vis_type',
           title: 'Vis option',
-          editor: QueryVisOptionTab
-        }
-      ]
+          editor: QueryVisOptionTab,
+        },
+      ],
     },
     requestHandler: visRequestHandler,
     responseHandler: 'none',

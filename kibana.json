@@ -1,11 +1,15 @@
 {
   "id": "kbnVisSql",
-  "version": "7.8.0",
+  "version": "7.10.0",
   "server": true,
   "ui": true,
   "requiredPlugins": [
     "data",
     "expressions",
-    "visualizations"
+    "esUiShared",
+    "visTypeVega",
+    "visualizations",
+    "visDefaultEditor",
+    "kibanaUtils"
   ]
 }
