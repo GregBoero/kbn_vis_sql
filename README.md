@@ -1,6 +1,6 @@
 # kbn_vis_sql
 
-> Kibana plugin that allow us to display data using the Elasticsearch SLQ Query   
+> Kibana plugin that allow us to display data using the Elasticsearch SQL Query   
 
 > Available chart type : DataTable 
 >
@@ -17,11 +17,10 @@
 |:-------------:|:-------------:|
 
 
-| Kibana version| Compatible    | check          | 
-|:-------------:|:-------------:|:-------------: |
-| < 7.8.0       |      NO       |    YES         | 
-| 7.8.0         |      YES      |    YES         |
-| 7.9.0         |      YES      |    YES         | 
+| Kibana version | Compatible    | check          | 
+|:--------------:|:-------------:|:-------------: |
+| < 7.15.0       |      NO       |    YES         | 
+| 7.15.0         |      YES      |    YES         |
 
 
 
