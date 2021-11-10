@@ -1,10 +1,10 @@
 import {fetch} from '../../common/lib/fetch';
 import {API_ROUTE_SQL} from '../../common/constants';
-import {CoreSetup} from "kibana/public";
-import { getNotifications } from '../service';
+import {getNotifications} from '../service';
+import {FilterVisCoreSetup} from "../plugin";
 
 
-export function submitRequest(core: CoreSetup, sqlQuery: any) {
+export function submitRequest(core: FilterVisCoreSetup, sqlQuery: any) {
   const apiPath = core.http.basePath.get() + `${API_ROUTE_SQL}`;
   const toastNotifications = getNotifications().toasts;
   return fetch.post(`${apiPath}`, {...sqlQuery}).then(results => {

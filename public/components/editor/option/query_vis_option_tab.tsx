@@ -2,21 +2,15 @@ import React, { ChangeEvent, Component } from 'react';
 import _ from 'lodash';
 import { EuiForm, EuiFormRow, EuiSelect, EuiSpacer, EuiSwitch, EuiSwitchEvent } from '@elastic/eui';
 
-import { QueryVisParams } from '../query/query_controls_tab';
+import {QueryControlsTabProps, QueryVisParams} from 'plugins/kbn_vis_sql/common/import';
 import { getAvailableVisType } from '../../../../common/SqlVIsOptionHelper';
-import { VisOptionsProps } from '../../../../common/import';
 
-type QueryVisOptionTabProps = Pick<
-  VisOptionsProps<QueryVisParams>,
-  'vis' | 'stateParams' | 'setValue'
-> & {
-  stateParams: any;
-};
 
-export class QueryVisOptionTab extends Component<QueryVisOptionTabProps, QueryVisParams> {
+
+class QueryVisOptionTab extends Component<QueryControlsTabProps, QueryVisParams> {
   options = getAvailableVisType();
 
-  constructor(props: QueryVisOptionTabProps, context: any) {
+  constructor(props: QueryControlsTabProps, context: any) {
     super(props, context);
   }
 
@@ -65,3 +59,7 @@ export class QueryVisOptionTab extends Component<QueryVisOptionTabProps, QueryVi
     );
   }
 }
+
+// default export required for React.Lazy
+// eslint-disable-next-line import/no-default-export
+export { QueryVisOptionTab as default };

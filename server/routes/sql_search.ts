@@ -1,8 +1,9 @@
-import Boom from 'boom';
-import { IRouter } from 'kibana/server';
-import { schema } from '@kbn/config-schema';
-import { API_ROUTE_SQL } from '../../common/constants';
-import { SqlSearchCache } from '../lib/sql_search_cache';
+import Boom from '@hapi/boom';
+import {IRouter} from 'kibana/server';
+// @ts-ignore
+import {schema} from '@kbn/config-schema';
+import {API_ROUTE_SQL} from '../../common/constants';
+import {SqlSearchCache} from '../lib/sql_search_cache';
 
 export function sqlSearch(router: IRouter) {
   const routePrefix = API_ROUTE_SQL;
@@ -28,7 +29,7 @@ export function sqlSearch(router: IRouter) {
       if (!request.body) {
         return Promise.reject(Boom.badRequest('A query payload is required'));
       }
-      const { client } = context.core.elasticsearch.legacy;
+      const client = context.core.elasticsearch.client.asCurrentUser;
       // FIXME remove the call to the new not more required
       return sqlCache
         .search(client, request)
@@ -37,7 +38,9 @@ export function sqlSearch(router: IRouter) {
             body: value,
           })
         )
-        .catch((err: any) => res.badRequest(err));
+        .catch((err: any) => res.badRequest({
+          body: err.message,
+        }));
     }
   );
 }

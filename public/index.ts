@@ -1,3 +1,4 @@
+// @ts-ignore
 import { PluginInitializerContext } from 'kibana/public';
 import { SqlVisPlugin as Plugin } from './plugin';
 

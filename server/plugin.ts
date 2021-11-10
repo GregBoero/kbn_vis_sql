@@ -23,4 +23,5 @@ export class KbnVisSqlServer implements Plugin {
   start(core: CoreStart, plugins: object): Promise<void> | void {
     return undefined;
   }
+
 }

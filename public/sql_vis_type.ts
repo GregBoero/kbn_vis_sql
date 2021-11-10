@@ -1,17 +1,15 @@
 import {SqlVisDependencies} from "./plugin";
 
-import {SqlRequestHandlerProvider} from "./sql_request_handler_provider";
-import {QueryControlsTab} from "./components/editor/query/query_controls_tab";
-import {QueryVisOptionTab} from "./components/editor/option/query_vis_option_tab";
-import {createSqlVisController} from "./vis_controller";
-import {defaultFeedbackMessage} from "../common/feedback_message";
 import {DATATABLE_TYPE} from "../common/SqlVIsOptionHelper";
 import {DefaultEditorSize} from '../common/import';
+import {toExpressionAst} from "./toExpressionAst";
+import {getControlsTab, OptionsTabLazy} from "./components/editor";
 
 
-export function createSqlVisTypeDefinition(deps: SqlVisDependencies) {
-  const visRequestHandler = SqlRequestHandlerProvider(deps);
-  const visController = createSqlVisController(deps);
+export function createSqlVisTypeDefinition(deps: Readonly<SqlVisDependencies>) {
+
+  const ControlsTab = getControlsTab()
+  const optionTab = OptionsTabLazy()
 
   return {
     name: 'kbn_vis_sql',
@@ -25,7 +23,7 @@ export function createSqlVisTypeDefinition(deps: SqlVisDependencies) {
       showQueryBar: true,
       showFilterBar: true,
     },
-    visualization: visController,
+    toExpressionAst,
     visConfig: {
       defaults: {
         query: '',
@@ -42,16 +40,15 @@ export function createSqlVisTypeDefinition(deps: SqlVisDependencies) {
         {
           name: 'query_controls',
           title: 'Query',
-          editor: QueryControlsTab,
+          editor: ControlsTab,
         },
         {
           name: 'vis_type',
           title: 'Vis option',
-          editor: QueryVisOptionTab,
+          editor: optionTab,
         },
       ],
     },
-    requestHandler: visRequestHandler,
-    responseHandler: 'none',
+    inspectorAdapters: {}
   };
 }

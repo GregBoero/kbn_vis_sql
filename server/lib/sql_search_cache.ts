@@ -1,6 +1,6 @@
 import LRUCache from 'lru-cache';
 import { camelCase, map, zipObject } from 'lodash';
-import { ILegacyScopedClusterClient, KibanaRequest } from 'kibana/server';
+import {ElasticsearchClient, KibanaRequest} from 'kibana/server';
 
 // TODO replace console.debug by a logger
 
@@ -19,7 +19,7 @@ export class SqlSearchCache {
    * @param {object} request the request
    */
   search = (
-    esClient: ILegacyScopedClusterClient,
+    esClient: ElasticsearchClient,
     request: KibanaRequest<unknown, unknown, unknown, 'post'>
   ): Promise<any> => {
     // TODO fix ts-ignore with a real object
@@ -64,7 +64,7 @@ export class SqlSearchCache {
     };
   }
 
-  async _fetchSqlData(esClient: ILegacyScopedClusterClient, request: any) {
+  async _fetchSqlData(esClient: ElasticsearchClient, request: any) {
     let requestObject;
     // the received request is for the next page
     if (request.body.cursor) {
@@ -78,11 +78,12 @@ export class SqlSearchCache {
 
     // console.debug('requested VisType : ' + request.body.visType);
     return esClient
-      .callAsCurrentUser('transport.request', requestObject)
+      .transport.request(requestObject)
       .then((res: any) => {
-        return this._handleDataVisType(res, request.body.visType);
+        return this._handleDataVisType(res.body, request.body.visType);
       })
-      .catch((e: any) => Promise.reject(e));
+      .catch((e: any) =>
+        Promise.reject(e));
   }
 
   // depending of the visType we format the data correctly

@@ -1,3 +1,4 @@
+// @ts-ignore
 import { PluginInitializerContext } from 'kibana/server';
 import { KbnVisSqlServer } from './plugin';
 

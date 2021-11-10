@@ -1,21 +1,24 @@
 import ace from 'brace';
-import { DslQuery } from '../../../src/plugins/data/common';
+import {DslQuery} from '../../../src/plugins/data/common';
+// @ts-ignore
 import {
-  Vis,
+  Vis, VisEditorOptionsProps,
   VisParams,
   VisualizationsSetup,
   VisualizationsStart,
 } from '../../../src/plugins/visualizations/public';
+// @ts-ignore
 import {
   DataPublicPluginSetup,
   DataPublicPluginStart,
-  esQuery,
-  Filter,
   Query,
   TimeRange,
 } from '../../../src/plugins/data/public';
-import { NotificationsStart, IUiSettingsClient, SavedObjectsStart } from '../../../src/core/public';
-import { VisOptionsProps } from '../../../src/plugins/vis_default_editor/public';
+
+import {Filter, buildEsQuery} from "@kbn/es-query"
+import {NotificationsStart, IUiSettingsClient, SavedObjectsStart} from '../../../src/core/public';
+// @ts-ignore
+import {VisOptionsProps} from '../../../src/plugins/vis_default_editor/public';
 
 import {
   ExpressionFunctionDefinition,
@@ -24,12 +27,12 @@ import {
   Render,
   KibanaContext,
 } from '../../../src/plugins/expressions/public';
-import { DefaultEditorSize } from '../../../src/plugins/vis_default_editor/public';
+import {DefaultEditorSize} from '../../../src/plugins/vis_default_editor/public';
 
-import { createGetterSetter } from '../../../src/plugins/kibana_utils/public';
+import {createGetterSetter} from '../../../src/plugins/kibana_utils/public';
 
 
-const { TextHighlightRules } = ace.acequire('ace/mode/text_highlight_rules');
+const {TextHighlightRules} = ace.acequire('ace/mode/text_highlight_rules');
 const oop = ace.acequire('ace/lib/oop');
 
 const ElasticsearchSqlHighlightRules = function (this: any) {
@@ -121,13 +124,26 @@ const ElasticsearchSqlHighlightRules = function (this: any) {
   this.normalizeRules();
 };
 oop.inherits(ElasticsearchSqlHighlightRules, TextHighlightRules);
+import {getEsQueryConfig} from "../../../src/plugins/data/common";
+
+
+export interface QueryVisParams {
+  query: string;
+  visType: string;
+  useTimeFilter: boolean;
+  isLoading: boolean;
+  exportName: string;
+}
+
+export type QueryControlsTabProps = VisEditorOptionsProps<QueryVisParams>
+
 export {
+  buildEsQuery,
   VisParams,
   Vis,
   VisualizationsSetup,
   VisualizationsStart,
   Filter,
-  esQuery,
   Query,
   TimeRange,
   DslQuery,
@@ -145,4 +161,5 @@ export {
   KibanaContext,
   DefaultEditorSize,
   createGetterSetter,
+  getEsQueryConfig,
 };
