@@ -1,0 +1,11 @@
+{
+  "id": "kbnVisSql",
+  "version": "7.8.0",
+  "server": true,
+  "ui": true,
+  "requiredPlugins": [
+    "data",
+    "expressions",
+    "visualizations"
+  ]
+}

@@ -1,31 +1,42 @@
-import {Component} from 'react';
-import {
-  EuiInMemoryTable,
-  EuiButton, EuiFlexGroup, EuiFlexItem
-} from '@elastic/eui';
-import React from 'react';
-import PropTypes from 'prop-types';
-import {each, isObject, toArray} from 'lodash'
+import React, {Component} from 'react';
+// @ts-ignore
 import {saveAs} from '@elastic/filesaver'
-import moment from 'moment/moment'
+import {EuiButton, EuiFlexGroup, EuiFlexItem, EuiInMemoryTable} from '@elastic/eui';
+import moment from 'moment';
+import _ from 'lodash';
 
-export class CustomDatatable extends Component {
 
-  constructor(props, context) {
+interface CustomDatatableProps {
+  datasource: any,
+  getNextPage: () => any,
+}
+
+interface CustomDatatableState {
+  columns: Array<any>;
+  items: Array<any>;
+  csv: { filename: string, separator: string, quoteValues: boolean };
+  cursor: any;
+  isLoading: boolean;
+}
+
+export class CustomDatatable extends Component<CustomDatatableProps, CustomDatatableState> {
+  state: CustomDatatableState = {
+    columns: [],
+    items: [],
+    csv: {filename: '', separator: ',', quoteValues: true},
+    cursor: {},
+    isLoading: true,
+  };
+
+
+  constructor(props: CustomDatatableProps, context: any) {
     super(props, context);
-    this.state = {
-      columns: [],
-      items: [],
-      csv: {filename: '', separator: ',', quoteValues: true},
-      cursor: {},
-      isLoading: true,
-    };
     this._datasourceToStateModel();
   }
 
   _datasourceToStateModel() {
     const datasource = this.props.datasource;
-    this.state.columns = each(datasource.columns, (column) => column.sortable = true);
+    this.state.columns = _.each(datasource.columns, (column) => column.sortable = true);
     this.state.items = datasource.rows;
     this.state.csv.filename = moment().toISOString() + datasource.exportName + '.csv';
     this.state.cursor = datasource.cursor;
@@ -33,8 +44,8 @@ export class CustomDatatable extends Component {
   }
 
   _afterPageUpdate() {
-    const datatable = this.props.datatable;
-    const columns = each(datatable.columns, (column) => column.sortable = true);
+    const datatable = this.props.datasource;
+    const columns = _.each(datatable.columns, (column) => column.sortable = true);
     const items = datatable.rows;
     const filename = moment().toISOString() + datatable.exportName + '.csv';
     const cursor = datatable.cursor;
@@ -47,12 +58,12 @@ export class CustomDatatable extends Component {
     }));
   }
 
-  _toCsv() {
+  _toCsv(): any {
     const nonAlphaNumRE = /[^a-zA-Z0-9]/;
     const allDoubleQuoteRE = /"/g;
     const quoteValues = this.state.csv.quoteValues;
 
-    const escape = (val) => {
+    const escape = (val: any) => {
       if (quoteValues && nonAlphaNumRE.test(val)) {
         val = '"' + val.replace(allDoubleQuoteRE, '""') + '"';
       }
@@ -62,8 +73,8 @@ export class CustomDatatable extends Component {
     // escape each cell in each row
     if (this.state.items && this.state.columns) {
       const csvRows = this.state.items.map(function (row) {
-        if (isObject(row)) {
-          row = toArray(row);
+        if (_.isObject(row)) {
+          row = _.toArray(row);
         }
         return row.map(escape);
       });
@@ -105,7 +116,8 @@ export class CustomDatatable extends Component {
           </EuiButton>
         </EuiFlexItem>
 
-      </EuiFlexGroup>);
+      </EuiFlexGroup>
+    );
   }
 
   render() {
@@ -126,10 +138,5 @@ export class CustomDatatable extends Component {
       />
     );
   }
+
 }
-
-CustomDatatable.propTypes = {
-  datasource: PropTypes.object.isRequired,
-  getNextPage: PropTypes.func.isRequired,
-};
-
